@@ -16,7 +16,8 @@ These instructions apply to files under `openai_agents_sdk/`.
 
 ## Notebook Conventions
 
-- Use `!pip install -q openai-agents python-dotenv` in each notebook.
+- Use `!pip install -q openai-agents python-dotenv` for text notebooks.
+- Use `!pip install -q openai-agents[voice] python-dotenv numpy sounddevice` for voice notebooks.
 - Load `OPENAI_API_KEY` from the repo root `.env` with `load_dotenv("../../.env")`.
 - Keep project code in notebook cells rather than helper modules unless explicitly requested.
 - Use structured outputs with Pydantic where they make the result easier to inspect.
@@ -25,7 +26,6 @@ These instructions apply to files under `openai_agents_sdk/`.
 ## Project Boundaries
 
 - Project 1: Deep Research Agent.
-- Project 2: Resume Job Fit Analyzer.
-- Project 3: GitHub Copilot with MCP.
+- Project 2: Voice Interview Agent.
 
-Do not reintroduce the old code review project unless explicitly requested.
+Do not reintroduce old projects (code review, resume analyzer, GitHub copilot) unless explicitly requested.

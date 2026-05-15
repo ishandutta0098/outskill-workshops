@@ -1,3 +1,5 @@
-openai-agents
+openai-agents[voice]
 pydantic
 python-dotenv
+numpy
+sounddevice
