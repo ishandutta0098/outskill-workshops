@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>IndiGo Assistant — Your Seamless Travel Partner</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#000d5d",
+            "primary-container": "#001b94",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#7e8eff",
+            "sky-tint": "#EAF8FF",
+            "ink-blue": "#25304B",
+            "surface": "#f7f9fb",
+            "surface-container-low": "#f2f4f6",
+            "surface-container-lowest": "#ffffff",
+            "on-surface": "#191c1e",
+            "on-surface-variant": "#454653",
+            "outline-variant": "#c5c5d5",
+            "outline": "#757684",
+            "success-green": "#209326",
+            "background": "#f7f9fb",
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+    h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block; line-height: 1;
+    }
+  </style>
+</head>
+<body class="bg-[#f7f9fb] text-[#191c1e]">
+
+  <!-- Nav -->
+  <header class="bg-[#f7f9fb] border-b border-[#c5c5d5] sticky top-0 z-50">
+    <div class="flex justify-between items-center w-full px-4 py-3 max-w-6xl mx-auto">
+      <div class="flex items-center gap-6">
+        <span class="text-2xl font-bold text-[#000d5d]" style="font-family:'Plus Jakarta Sans',sans-serif">IndiGo Assistant</span>
+        <nav class="hidden md:flex items-center gap-6 ml-8">
+          <a href="indigo.html" class="text-[#000d5d] font-semibold border-b-2 border-[#000d5d] pb-0.5 text-sm">Home</a>
+          <a href="indigo-chat.html" class="text-[#454653] hover:text-[#000d5d] text-sm transition-colors">Chat</a>
+          <a href="#" class="text-[#454653] hover:text-[#000d5d] text-sm transition-colors">Bookings</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/" class="text-[#454653] hover:text-[#000d5d] text-sm transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          Showcase
+        </a>
+        <button class="material-symbols-outlined text-[#000d5d] p-2 rounded-full hover:bg-[#EAF8FF] transition-colors">notifications</button>
+        <button class="material-symbols-outlined text-[#000d5d] p-2 rounded-full hover:bg-[#EAF8FF] transition-colors">account_circle</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 md:px-6 py-10">
+
+    <!-- Hero -->
+    <section class="mb-10">
+      <div class="flex flex-col lg:flex-row items-center gap-6">
+        <div class="flex-1 text-center lg:text-left">
+          <h1 class="text-5xl font-bold text-[#000d5d] mb-3 leading-tight" style="font-family:'Plus Jakarta Sans',sans-serif; letter-spacing:-0.02em">
+            Where can I fly<br/>you today?
+          </h1>
+          <p class="text-[#454653] text-lg mb-6 max-w-xl leading-relaxed">
+            Experience the future of travel with our AI Assistant. From instant booking to real-time flight updates, we've got you covered.
+          </p>
+
+          <!-- AI Chat Input -->
+          <form id="hero-form" class="max-w-2xl mx-auto lg:mx-0" onsubmit="goToChat(event)">
+            <div class="flex items-center bg-white border border-[#c5c5d5] rounded-xl p-2 shadow-sm focus-within:ring-2 focus-within:ring-[#001b94] transition-all">
+              <span class="material-symbols-outlined text-[#757684] px-2">chat_bubble</span>
+              <input
+                id="hero-input"
+                type="text"
+                placeholder="Try 'Find a flight to Mumbai tomorrow morning'"
+                class="flex-1 bg-transparent border-none focus:ring-0 text-[#191c1e] text-base py-3 px-2 placeholder-[#757684]"
+              />
+              <button type="submit" class="bg-[#001b94] text-white px-6 py-3 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
+                Ask AI
+              </button>
+            </div>
+          </form>
+
+          <!-- Quick chips -->
+          <div class="flex flex-wrap gap-2 mt-4">
+            <button onclick="goToChatWith('Baggage allowance on domestic flights')" class="bg-[#EAF8FF] text-[#000d5d] text-xs font-medium px-3 py-1.5 rounded-full border border-[#c5c5d5] hover:bg-[#ddf0fc] transition-colors">
+              Baggage policy
+            </button>
+            <button onclick="goToChatWith('How do I do web check-in?')" class="bg-[#EAF8FF] text-[#000d5d] text-xs font-medium px-3 py-1.5 rounded-full border border-[#c5c5d5] hover:bg-[#ddf0fc] transition-colors">
+              Web check-in
+            </button>
+            <button onclick="goToChatWith('I want to change my seat to 12A, confirmation ABC123')" class="bg-[#EAF8FF] text-[#000d5d] text-xs font-medium px-3 py-1.5 rounded-full border border-[#c5c5d5] hover:bg-[#ddf0fc] transition-colors">
+              Change seat
+            </button>
+            <button onclick="goToChatWith('What is the wifi name on the flight?')" class="bg-[#EAF8FF] text-[#000d5d] text-xs font-medium px-3 py-1.5 rounded-full border border-[#c5c5d5] hover:bg-[#ddf0fc] transition-colors">
+              WiFi info
+            </button>
+          </div>
+        </div>
+
+        <!-- Hero visual -->
+        <div class="hidden lg:flex flex-1 relative h-96 w-full rounded-2xl overflow-hidden border border-[#c5c5d5] items-center justify-center bg-gradient-to-br from-[#001b94] via-[#000d5d] to-[#0e1a34]">
+          <div class="text-center text-white p-8">
+            <span class="material-symbols-outlined text-[72px] mb-4 block opacity-80">flight_takeoff</span>
+            <p class="text-xl font-semibold mb-2" style="font-family:'Plus Jakarta Sans',sans-serif">IndiGo AI Assistant</p>
+            <p class="text-sm opacity-70">Powered by OpenAI Agents SDK</p>
+            <div class="mt-6 flex flex-col gap-2 text-left max-w-xs mx-auto">
+              <div class="bg-[#EAF8FF]/10 backdrop-blur rounded-lg px-3 py-2 text-sm text-white/80 border border-white/10">
+                🤖 How may I assist you today?
+              </div>
+              <div class="bg-white/10 backdrop-blur rounded-lg px-3 py-2 text-sm text-white/80 border border-white/10 self-end">
+                Baggage limit for domestic?
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Travel Links -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+      <!-- Book a Flight -->
+      <div onclick="goToChatWith('I want to book a flight')" class="bg-[#f2f4f6] p-6 rounded-xl border border-[#c5c5d5] flex flex-col justify-between hover:bg-[#EAF8FF] transition-colors cursor-pointer group">
+        <div>
+          <div class="bg-[#001b94] w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-white text-[22px]" style="font-variation-settings:'FILL' 1">confirmation_number</span>
+          </div>
+          <h3 class="text-lg font-semibold text-[#000d5d] mb-1" style="font-family:'Plus Jakarta Sans',sans-serif">Book a Flight</h3>
+          <p class="text-sm text-[#454653]">Find the best fares across our vast network of domestic and international routes.</p>
+        </div>
+        <div class="mt-5 flex items-center text-[#000d5d] font-bold group-hover:translate-x-1 transition-transform">
+          <span class="text-sm font-semibold">Start Booking</span>
+          <span class="material-symbols-outlined ml-1 text-[18px]">chevron_right</span>
+        </div>
+      </div>
+
+      <!-- Flight Status -->
+      <div onclick="goToChatWith('Check flight status')" class="bg-[#f2f4f6] p-6 rounded-xl border border-[#c5c5d5] flex flex-col justify-between hover:bg-[#EAF8FF] transition-colors cursor-pointer group">
+        <div>
+          <div class="bg-[#001b94] w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-white text-[22px]" style="font-variation-settings:'FILL' 1">flight_takeoff</span>
+          </div>
+          <h3 class="text-lg font-semibold text-[#000d5d] mb-1" style="font-family:'Plus Jakarta Sans',sans-serif">Flight Status</h3>
+          <p class="text-sm text-[#454653]">Get real-time updates on your flight timing, gate changes, and delay notifications.</p>
+        </div>
+        <div class="mt-5 flex items-center text-[#000d5d] font-bold group-hover:translate-x-1 transition-transform">
+          <span class="text-sm font-semibold">Track Now</span>
+          <span class="material-symbols-outlined ml-1 text-[18px]">chevron_right</span>
+        </div>
+      </div>
+
+      <!-- Web Check-in -->
+      <div onclick="goToChatWith('How do I do web check-in on IndiGo?')" class="bg-[#f2f4f6] p-6 rounded-xl border border-[#c5c5d5] flex flex-col justify-between hover:bg-[#EAF8FF] transition-colors cursor-pointer group">
+        <div>
+          <div class="bg-[#001b94] w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-white text-[22px]" style="font-variation-settings:'FILL' 1">check_circle</span>
+          </div>
+          <h3 class="text-lg font-semibold text-[#000d5d] mb-1" style="font-family:'Plus Jakarta Sans',sans-serif">Web Check-in</h3>
+          <p class="text-sm text-[#454653]">Skip the queues — check in online up to 48 hours before departure and select your seat.</p>
+        </div>
+        <div class="mt-5 flex items-center text-[#000d5d] font-bold group-hover:translate-x-1 transition-transform">
+          <span class="text-sm font-semibold">Check In</span>
+          <span class="material-symbols-outlined ml-1 text-[18px]">chevron_right</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info banner -->
+    <section class="bg-[#001b94] rounded-2xl p-6 text-white flex flex-col md:flex-row items-center justify-between gap-4">
+      <div>
+        <h3 class="text-lg font-semibold mb-1" style="font-family:'Plus Jakarta Sans',sans-serif">Powered by OpenAI Agents SDK</h3>
+        <p class="text-sm opacity-80">This demo uses a multi-agent system with triage, FAQ specialist, seat booking agent, and safety guardrails.</p>
+      </div>
+      <a href="indigo-chat.html" class="flex-shrink-0 bg-white text-[#000d5d] px-6 py-3 rounded-lg text-sm font-semibold hover:bg-[#EAF8FF] transition-colors whitespace-nowrap">
+        Open Chat
+      </a>
+    </section>
+
+  </main>
+
+  <script>
+    function goToChat(e) {
+      e.preventDefault();
+      const q = document.getElementById('hero-input').value.trim();
+      if (q) {
+        sessionStorage.setItem('indigo_prefill', q);
+      }
+      window.location.href = 'indigo-chat.html';
+    }
+
+    function goToChatWith(msg) {
+      sessionStorage.setItem('indigo_prefill', msg);
+      window.location.href = 'indigo-chat.html';
+    }
+  </script>
+</body>
+</html>

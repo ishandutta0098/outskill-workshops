@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+  <title>IndiGo Assistant — Chat</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#000d5d",
+            "primary-container": "#001b94",
+            "sky-tint": "#EAF8FF",
+            "ink-blue": "#25304B",
+            "surface": "#f7f9fb",
+            "surface-container-lowest": "#ffffff",
+            "on-surface": "#191c1e",
+            "on-surface-variant": "#454653",
+            "outline-variant": "#c5c5d5",
+            "outline": "#757684",
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    #chat-messages { scroll-behavior: smooth; }
+    .typing-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #757684; animation: bounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+  </style>
+</head>
+<body class="bg-[#f7f9fb] text-[#191c1e] flex flex-col h-screen overflow-hidden">
+
+  <!-- Header -->
+  <header class="bg-[#f7f9fb] border-b border-[#c5c5d5] z-50 flex-shrink-0">
+    <div class="flex justify-between items-center w-full px-4 py-3 max-w-3xl mx-auto">
+      <div class="flex items-center gap-3">
+        <a href="indigo.html" class="material-symbols-outlined text-[#000d5d] hover:bg-[#EAF8FF] p-1 rounded-full transition-colors">arrow_back</a>
+        <div>
+          <span class="text-base font-bold text-[#000d5d]" style="font-family:'Plus Jakarta Sans',sans-serif">IndiGo Assistant</span>
+          <div id="status-line" class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#209326]"></span>
+            <span class="text-xs text-[#454653]">Online</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="newSession()" title="New conversation" class="text-xs text-[#454653] hover:text-[#000d5d] border border-[#c5c5d5] px-3 py-1.5 rounded-lg hover:border-[#000d5d] transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">add</span>
+          New chat
+        </button>
+        <nav class="hidden md:flex items-center gap-4">
+          <a href="indigo.html" class="text-[#454653] hover:text-[#000d5d] text-sm transition-colors px-2 py-1 rounded-lg hover:bg-[#EAF8FF]">Home</a>
+          <a href="indigo-chat.html" class="text-[#000d5d] font-semibold border-b-2 border-[#000d5d] text-sm px-2 py-1">Chat</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Chat area -->
+  <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-5 max-w-3xl mx-auto w-full space-y-4">
+    <!-- Messages injected by JS -->
+  </div>
+
+  <!-- Input bar -->
+  <div class="flex-shrink-0 border-t border-[#c5c5d5] bg-[#f7f9fb] pb-safe">
+    <div class="max-w-3xl mx-auto px-4 py-3">
+      <!-- Quick chips (shown only initially) -->
+      <div id="quick-chips" class="flex flex-wrap gap-2 mb-3">
+        <button onclick="sendQuick('What is IndiGo\'s baggage policy?')" class="bg-[#EAF8FF] text-[#000d5d] text-xs font-medium px-3 py-1.5 rounded-full border border-[#c5c5d5] hover:bg-[#ddf0fc] transition-colors">Baggage policy</button>
+        <button onclick="sendQuick('How do I do web check-in?')" class="bg-[#EAF8FF] text-[#000d5d] text-xs font-medium px-3 py-1.5 rounded-full border border-[#c5c5d5] hover:bg-[#ddf0fc] transition-colors">Web check-in</button>
+        <button onclick="sendQuick('Change my seat to 12A, confirmation ABC123')" class="bg-[#EAF8FF] text-[#000d5d] text-xs font-medium px-3 py-1.5 rounded-full border border-[#c5c5d5] hover:bg-[#ddf0fc] transition-colors">Change seat</button>
+        <button onclick="sendQuick('What is the wifi name on the flight?')" class="bg-[#EAF8FF] text-[#000d5d] text-xs font-medium px-3 py-1.5 rounded-full border border-[#c5c5d5] hover:bg-[#ddf0fc] transition-colors">WiFi name</button>
+      </div>
+
+      <form id="chat-form" onsubmit="sendMessage(event)" class="flex items-end gap-2">
+        <div class="flex-1 flex items-center bg-white border border-[#c5c5d5] rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-[#001b94] focus-within:border-[#001b94] transition-all">
+          <input
+            id="msg-input"
+            type="text"
+            placeholder="Type a message..."
+            autocomplete="off"
+            class="flex-1 bg-transparent border-none focus:ring-0 text-[#191c1e] text-sm placeholder-[#757684]"
+          />
+        </div>
+        <button
+          type="submit"
+          id="send-btn"
+          class="bg-[#001b94] text-white p-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40"
+        >
+          <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1">send</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const SESSION_KEY = 'indigo_session_id';
+    let sessionId = localStorage.getItem(SESSION_KEY) || crypto.randomUUID();
+    localStorage.setItem(SESSION_KEY, sessionId);
+
+    const chatEl = document.getElementById('chat-messages');
+    const inputEl = document.getElementById('msg-input');
+    const sendBtn = document.getElementById('send-btn');
+    const chips = document.getElementById('quick-chips');
+    let messageCount = 0;
+
+    function newSession() {
+      sessionId = crypto.randomUUID();
+      localStorage.setItem(SESSION_KEY, sessionId);
+      chatEl.innerHTML = '';
+      messageCount = 0;
+      chips.classList.remove('hidden');
+      addBotMessage("Hello! I'm IndiGo Assistant. How can I help you today?", "IndiGo Assistant");
+    }
+
+    function addBotMessage(text, agentName, handoffs = []) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex flex-col items-start max-w-[85%] md:max-w-[70%]';
+
+      if (handoffs.length > 0) {
+        const handoffEl = document.createElement('div');
+        handoffEl.className = 'flex items-center gap-1.5 mb-1.5 text-xs text-[#454653]';
+        handoffEl.innerHTML = `<span class="material-symbols-outlined text-[14px]">swap_horiz</span>${handoffs.join(' → ')}`;
+        wrapper.appendChild(handoffEl);
+      }
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bg-[#EAF8FF] text-[#25304B] px-4 py-3 rounded-xl rounded-tl-none border border-[#c5c5d5] text-sm leading-relaxed';
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+
+      const meta = document.createElement('p');
+      meta.className = 'text-xs text-[#757684] mt-1 ml-1';
+      meta.textContent = agentName;
+      wrapper.appendChild(meta);
+
+      chatEl.appendChild(wrapper);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function addUserMessage(text) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex justify-end';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bg-white text-[#25304B] px-4 py-3 rounded-xl rounded-tr-none border border-[#c5c5d5] text-sm leading-relaxed max-w-[85%] md:max-w-[70%]';
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+
+      chatEl.appendChild(wrapper);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function addTypingIndicator() {
+      const id = 'typing-' + Date.now();
+      const wrapper = document.createElement('div');
+      wrapper.id = id;
+      wrapper.className = 'flex items-start max-w-[85%]';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bg-[#EAF8FF] border border-[#c5c5d5] rounded-xl rounded-tl-none px-4 py-3 flex gap-1 items-center';
+      bubble.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+      wrapper.appendChild(bubble);
+
+      chatEl.appendChild(wrapper);
+      chatEl.scrollTop = chatEl.scrollHeight;
+      return id;
+    }
+
+    function addBlockedMessage() {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex flex-col items-start max-w-[85%] md:max-w-[70%]';
+      const badge = document.createElement('div');
+      badge.className = 'flex items-center gap-1.5 mb-1.5 text-xs text-[#ba1a1a] bg-[#ffdad6] px-2 py-1 rounded-full';
+      badge.innerHTML = '<span class="material-symbols-outlined text-[14px]">shield</span>Guardrail triggered';
+      wrapper.appendChild(badge);
+      const bubble = document.createElement('div');
+      bubble.className = 'bg-[#EAF8FF] text-[#25304B] px-4 py-3 rounded-xl rounded-tl-none border border-[#c5c5d5] text-sm leading-relaxed';
+      bubble.textContent = "I'm sorry, I can only help with airline-related questions. Please ask about flights, baggage, check-in, or bookings.";
+      wrapper.appendChild(bubble);
+      chatEl.appendChild(wrapper);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    async function sendMessage(e) {
+      if (e) e.preventDefault();
+      const msg = inputEl.value.trim();
+      if (!msg) return;
+
+      inputEl.value = '';
+      sendBtn.disabled = true;
+      chips.classList.add('hidden');
+      messageCount++;
+
+      addUserMessage(msg);
+      const typingId = addTypingIndicator();
+
+      try {
+        const res = await fetch('/api/indigo/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg, session_id: sessionId }),
+        });
+
+        document.getElementById(typingId)?.remove();
+
+        if (!res.ok) throw new Error('Request failed');
+        const data = await res.json();
+
+        if (data.blocked) {
+          addBlockedMessage();
+        } else {
+          addBotMessage(data.reply, data.agent, data.handoffs);
+        }
+      } catch (err) {
+        document.getElementById(typingId)?.remove();
+        addBotMessage('Sorry, something went wrong. Please try again.', 'System');
+      } finally {
+        sendBtn.disabled = false;
+        inputEl.focus();
+      }
+    }
+
+    function sendQuick(msg) {
+      inputEl.value = msg;
+      sendMessage();
+    }
+
+    // On load: show welcome + handle pre-fill
+    window.addEventListener('DOMContentLoaded', () => {
+      addBotMessage("Hello! I'm IndiGo Assistant. How can I help you today? You can ask about baggage, check-in, seat changes, or any flight queries.", "IndiGo Assistant");
+
+      const prefill = sessionStorage.getItem('indigo_prefill');
+      if (prefill) {
+        sessionStorage.removeItem('indigo_prefill');
+        inputEl.value = prefill;
+        setTimeout(() => sendMessage(), 300);
+      }
+    });
+  </script>
+</body>
+</html>

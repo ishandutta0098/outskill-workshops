@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Interview Engine — OpenAI SDK Engineer</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Geist:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    body { background-color: #000000; color: #e5e2e1; font-family: 'Geist', sans-serif; overflow: hidden; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+    .glass-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: #27272A; }
+    code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* Waveform bars */
+    .wave-bar {
+      width: 3px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.2);
+      transition: height 0.1s ease, background 0.3s ease;
+    }
+    .wave-bar.active { background: rgba(255,255,255,0.9); }
+    .wave-bar.speaking { background: rgba(255,255,255,1); }
+
+    /* Recording pulse ring */
+    @keyframes ping-ring {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+    .ping-ring { animation: ping-ring 1.2s cubic-bezier(0,0,0.2,1) infinite; }
+
+    /* Blinking cursor for live transcript */
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .cursor { animation: blink 1s step-end infinite; display: inline-block; width: 2px; height: 1em; background: currentColor; vertical-align: text-bottom; margin-left: 2px; }
+
+    /* Slide-in transcript messages */
+    @keyframes slideUp { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+    .slide-up { animation: slideUp 0.25s ease forwards; }
+  </style>
+</head>
+<body class="h-screen flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 h-screen flex-shrink-0 border-r border-[#27272A] bg-black flex flex-col z-50">
+    <div class="px-6 py-8">
+      <h1 class="text-lg font-semibold text-white tracking-tighter">OPENAI SDK</h1>
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-[#c4c7c8] mt-1 opacity-60">TECHNICAL ASSESSMENT</p>
+    </div>
+    <nav class="flex-1 px-2 space-y-0.5">
+      <a href="assessment.html" class="flex items-center text-[#c4c7c8] pl-4 py-3 hover:text-white transition-colors hover:bg-white/[0.03]">
+        <span class="material-symbols-outlined mr-3">dashboard</span>
+        <span class="text-[12px] font-semibold uppercase tracking-widest">Dashboard</span>
+      </a>
+      <a href="interview.html" class="flex items-center text-white font-bold border-l-2 border-white pl-4 py-3 bg-white/[0.03]">
+        <span class="material-symbols-outlined mr-3">mic_external_on</span>
+        <span class="text-[12px] font-semibold uppercase tracking-widest">Interviews</span>
+      </a>
+      <a href="#" class="flex items-center text-[#c4c7c8] pl-4 py-3 hover:text-white transition-colors hover:bg-white/[0.03]">
+        <span class="material-symbols-outlined mr-3">terminal</span>
+        <span class="text-[12px] font-semibold uppercase tracking-widest">Playground</span>
+      </a>
+      <a href="#" class="flex items-center text-[#c4c7c8] pl-4 py-3 hover:text-white transition-colors hover:bg-white/[0.03]">
+        <span class="material-symbols-outlined mr-3">analytics</span>
+        <span class="text-[12px] font-semibold uppercase tracking-widest">Analytics</span>
+      </a>
+    </nav>
+    <div class="px-4 mb-4">
+      <button onclick="endSession()" class="w-full bg-white text-black py-3 text-[12px] font-semibold uppercase tracking-widest hover:bg-white/90 transition-opacity">
+        New Interview
+      </button>
+    </div>
+    <div class="border-t border-[#27272A] px-2 py-4">
+      <a href="/" class="flex items-center text-[#c4c7c8] pl-4 py-2 hover:text-white transition-colors text-[12px] uppercase tracking-widest">
+        <span class="material-symbols-outlined mr-3 text-[18px]">arrow_back</span>
+        Showcase
+      </a>
+    </div>
+  </aside>
+
+  <!-- Right side: full layout -->
+  <div class="flex-1 flex flex-col h-screen overflow-hidden">
+
+    <!-- Top Bar -->
+    <header class="flex-shrink-0 flex justify-between items-center h-14 px-8 border-b border-[#27272A] bg-black/80 backdrop-blur-xl z-40">
+      <div class="flex items-center gap-5">
+        <span class="mono text-[12px] text-[#10B981] font-semibold uppercase tracking-widest">INTERVIEW ENGINE v1.0</span>
+        <div class="w-px h-4 bg-[#27272A]"></div>
+        <span class="mono text-[12px] text-[#8e9192]">Status: <span id="conn-status" class="text-[#10B981]">Online</span></span>
+        <span class="mono text-[12px] text-[#8e9192]" id="agent-label">Agent: <span class="text-white">GreeterAgent</span></span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div id="session-badge" class="mono text-[11px] text-[#8e9192] border border-[#27272A] px-2 py-1 hidden">
+          Session: <span id="session-short"></span>
+        </div>
+        <button onclick="endSession()" class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-1.5 mono text-[12px] uppercase tracking-widest hover:bg-red-500/20 transition-all">
+          End Session
+        </button>
+      </div>
+    </header>
+
+    <!-- Main grid: visualizer + transcription -->
+    <main class="flex-1 overflow-hidden grid grid-cols-12 gap-0 p-6 gap-6">
+
+      <!-- Left col: Waveform (top) -->
+      <div class="col-span-7 flex flex-col gap-6">
+
+        <!-- Waveform visualizer -->
+        <section class="flex-1 bg-[#0A0A0A] border border-[#27272A] relative flex flex-col items-center justify-center overflow-hidden min-h-0">
+          <div class="absolute top-4 left-5 flex items-center gap-2">
+            <div id="rec-dot" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+            <span class="mono text-[11px] text-[#8e9192] uppercase tracking-widest" id="feed-label">Live Voice Feed</span>
+          </div>
+
+          <!-- State ring -->
+          <div class="relative mb-6 flex items-center justify-center">
+            <div id="ping-ring" class="absolute w-16 h-16 rounded-full bg-white/5 ping-ring hidden"></div>
+            <div id="state-icon" class="w-14 h-14 rounded-full border border-[#27272A] flex items-center justify-center bg-[#0e0e0e]">
+              <span class="material-symbols-outlined text-[28px] text-[#8e9192]" id="state-icon-symbol">mic_none</span>
+            </div>
+          </div>
+
+          <!-- Waveform bars -->
+          <div id="waveform" class="flex items-center justify-center gap-[3px] h-20 w-full px-16">
+            <!-- Bars injected by JS -->
+          </div>
+
+          <div class="mt-5 text-center">
+            <p class="mono text-[12px] text-white mb-1 uppercase tracking-widest" id="ai-label">AI AGENT: INTERVIEWER</p>
+            <p class="mono text-[10px] text-[#8e9192] uppercase tracking-widest" id="status-text">IDLE — PRESS MIC TO SPEAK</p>
+          </div>
+        </section>
+
+        <!-- Info strip -->
+        <div class="bg-[#0A0A0A] border border-[#27272A] px-5 py-3 flex items-center gap-6">
+          <div>
+            <p class="mono text-[10px] text-[#8e9192] uppercase tracking-widest mb-0.5">Role</p>
+            <p class="text-sm text-white">AI Agents SDK Engineer — OpenAI</p>
+          </div>
+          <div class="w-px h-8 bg-[#27272A]"></div>
+          <div>
+            <p class="mono text-[10px] text-[#8e9192] uppercase tracking-widest mb-0.5">Mode</p>
+            <p class="text-sm text-white">Voice Interview</p>
+          </div>
+          <div class="w-px h-8 bg-[#27272A]"></div>
+          <div>
+            <p class="mono text-[10px] text-[#8e9192] uppercase tracking-widest mb-0.5">Questions</p>
+            <p class="text-sm text-white"><span id="q-count">0</span> / 4</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right col: Transcription feed -->
+      <section class="col-span-5 bg-[#0A0A0A] border border-[#27272A] flex flex-col overflow-hidden">
+        <div class="px-5 py-3 border-b border-[#27272A] flex justify-between items-center bg-black/50 flex-shrink-0">
+          <span class="mono text-[12px] text-white uppercase tracking-widest">Live Transcription</span>
+          <span class="mono text-[10px] text-[#10B981] uppercase tracking-widest">REAL-TIME SYNC</span>
+        </div>
+
+        <div id="transcript-feed" class="flex-1 overflow-y-auto p-5 space-y-5">
+          <!-- Injected by JS -->
+        </div>
+
+        <div class="px-5 py-3 border-t border-[#27272A] bg-black flex-shrink-0">
+          <div class="flex items-center gap-2 text-[#8e9192]">
+            <span class="material-symbols-outlined text-[16px]">keyboard_voice</span>
+            <p class="mono text-[11px]" id="mic-hint">Voice capture ready. Press mic button to speak.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Floating Controls Bar -->
+  <div class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 glass-blur bg-white/[0.03] border border-white/10 rounded-full z-50">
+
+    <!-- Mic button -->
+    <button
+      id="mic-btn"
+      onclick="toggleRecording(event)"
+      class="relative p-3 rounded-full hover:bg-white/10 transition-colors group"
+      title="Click to start or stop recording"
+    >
+      <div id="mic-pulse" class="absolute inset-0 rounded-full bg-red-500/30 scale-0 transition-transform duration-150"></div>
+      <span class="material-symbols-outlined text-[#c4c7c8] group-hover:text-white relative z-10" id="mic-icon">mic</span>
+    </button>
+
+    <div class="w-px h-6 bg-white/10"></div>
+
+    <button id="mute-btn" onclick="toggleMute()" class="p-3 rounded-full hover:bg-white/10 transition-colors group" title="Mute/unmute">
+      <span class="material-symbols-outlined text-[#c4c7c8] group-hover:text-white" id="mute-icon">volume_up</span>
+    </button>
+
+    <div class="w-px h-6 bg-white/10"></div>
+
+    <button onclick="endSession()" class="px-5 py-2 bg-red-500 text-white mono text-[12px] uppercase tracking-widest rounded-full hover:opacity-90 transition-opacity">
+      Leave Session
+    </button>
+
+  </div>
+
+  <!-- Completed overlay -->
+  <div id="completed-overlay" class="hidden fixed inset-0 bg-black/80 backdrop-blur z-[100] flex items-center justify-center">
+    <div class="bg-[#0e0e0e] border border-[#27272A] rounded-lg p-10 max-w-lg w-full text-center">
+      <span class="material-symbols-outlined text-[48px] text-[#10B981] mb-4 block" style="font-variation-settings:'FILL' 1">check_circle</span>
+      <h2 class="text-2xl font-semibold text-white mb-2 tracking-tight">Interview Complete</h2>
+      <p class="text-[#8e9192] text-sm mb-6">Your scorecard has been read aloud. Review the transcript below for detailed feedback.</p>
+      <div class="flex gap-3 justify-center">
+        <a href="assessment.html" class="border border-[#27272A] text-[#c4c7c8] px-5 py-2.5 mono text-[12px] uppercase tracking-widest hover:text-white hover:border-[#444748] transition-colors">Dashboard</a>
+        <button onclick="location.href='assessment.html'" class="bg-white text-black px-5 py-2.5 mono text-[12px] font-semibold uppercase tracking-widest hover:bg-white/90 transition-opacity">New Interview</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="reply-audio" hidden></audio>
+
+  <script>
+    const SESSION_KEY = 'interview_session_id';
+    let sessionId = sessionStorage.getItem(SESSION_KEY);
+    let isEnded = false;
+    let isMuted = false;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let questionCount = 0;
+    let audioCtx = null;
+    let analyser = null;
+    let animFrameId = null;
+    let stream = null;
+
+    // DOM refs
+    const transcriptEl = document.getElementById('transcript-feed');
+    const statusText = document.getElementById('status-text');
+    const feedLabel = document.getElementById('feed-label');
+    const micIcon = document.getElementById('mic-icon');
+    const micPulse = document.getElementById('mic-pulse');
+    const pingRing = document.getElementById('ping-ring');
+    const stateIconEl = document.getElementById('state-icon-symbol');
+    const agentLabel = document.getElementById('agent-label');
+    const micHint = document.getElementById('mic-hint');
+    const qCount = document.getElementById('q-count');
+    const waveformEl = document.getElementById('waveform');
+    const replyAudio = document.getElementById('reply-audio');
+
+    // Build waveform bars
+    const BAR_COUNT = 32;
+    const bars = [];
+    for (let i = 0; i < BAR_COUNT; i++) {
+      const b = document.createElement('div');
+      b.className = 'wave-bar';
+      b.style.height = '4px';
+      waveformEl.appendChild(b);
+      bars.push(b);
+    }
+
+    function setStatus(state) {
+      // state: idle | recording | processing | speaking
+      if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+      }
+      bars.forEach(b => b.classList.remove('active','speaking'));
+      if (state === 'idle') {
+        stateIconEl.textContent = 'mic_none';
+        stateIconEl.style.color = '#8e9192';
+        statusText.textContent = 'IDLE — HOLD MIC BUTTON TO SPEAK';
+        feedLabel.textContent = 'Live Voice Feed';
+        pingRing.classList.add('hidden');
+        micHint.textContent = 'Voice capture ready. Click mic to start recording.';
+        micPulse.style.transform = 'scale(0)';
+        micIcon.textContent = 'mic';
+        bars.forEach((b, i) => {
+          const h = Math.max(4, Math.round(6 + Math.sin(i * 0.5) * 4));
+          b.style.height = h + 'px';
+        });
+      } else if (state === 'recording') {
+        stateIconEl.textContent = 'mic';
+        stateIconEl.style.color = '#ef4444';
+        statusText.textContent = 'RECORDING — RELEASE TO SEND';
+        feedLabel.textContent = 'Recording...';
+        pingRing.classList.remove('hidden');
+        micHint.textContent = 'Recording in progress. Click mic again to send.';
+        micIcon.textContent = 'mic';
+        micPulse.style.transform = 'scale(1.4)';
+      } else if (state === 'processing') {
+        stateIconEl.textContent = 'psychology';
+        stateIconEl.style.color = '#c4c7c8';
+        statusText.textContent = 'AI IS THINKING...';
+        feedLabel.textContent = 'Processing...';
+        pingRing.classList.add('hidden');
+        micHint.textContent = 'Processing your response...';
+        micPulse.style.transform = 'scale(0)';
+        animateProcessing();
+      } else if (state === 'speaking') {
+        stateIconEl.textContent = 'volume_up';
+        stateIconEl.style.color = '#ffffff';
+        statusText.textContent = 'AI IS SPEAKING...';
+        feedLabel.textContent = 'AI Speaking';
+        pingRing.classList.remove('hidden');
+        micHint.textContent = 'AI is responding. Wait for it to finish.';
+        bars.forEach(b => b.classList.add('speaking'));
+        animateSpeakingWaveform();
+      }
+    }
+
+    function animateProcessing() {
+      let t = 0;
+      function frame() {
+        if (!['processing'].includes(currentState())) return;
+        t += 0.15;
+        bars.forEach((b, i) => {
+          const h = Math.max(4, Math.abs(Math.sin(t + i * 0.35)) * 40 + 4);
+          b.style.height = h + 'px';
+          b.classList.toggle('active', h > 20);
+        });
+        animFrameId = requestAnimationFrame(frame);
+      }
+      frame();
+    }
+
+    function animateFromMic(analyserNode) {
+      const dataArr = new Uint8Array(analyserNode.frequencyBinCount);
+      function frame() {
+        if (!isRecording) return;
+        analyserNode.getByteFrequencyData(dataArr);
+        const step = Math.floor(dataArr.length / BAR_COUNT);
+        bars.forEach((b, i) => {
+          const val = dataArr[i * step] || 0;
+          const h = Math.max(4, (val / 255) * 80 + 4);
+          b.style.height = h + 'px';
+          b.classList.toggle('active', val > 60);
+        });
+        animFrameId = requestAnimationFrame(frame);
+      }
+      frame();
+    }
+
+    function animateSpeakingWaveform() {
+      let t = 0;
+      function frame() {
+        if (currentState() !== 'speaking' || replyAudio.paused) return;
+        t += 0.22;
+        bars.forEach((b, i) => {
+          const wave = Math.sin(t + i * 0.45) * 0.5 + 0.5;
+          const pulse = Math.sin(t * 1.7 + i * 0.17) * 0.5 + 0.5;
+          const h = Math.max(6, wave * 58 + pulse * 24);
+          b.style.height = h + 'px';
+          b.classList.add('speaking');
+        });
+        animFrameId = requestAnimationFrame(frame);
+      }
+      frame();
+    }
+
+    let _currentState = 'idle';
+    function currentState() { return _currentState; }
+    function setState(s) { _currentState = s; setStatus(s); }
+
+    function setAgent(name) {
+      agentLabel.innerHTML = `Agent: <span class="text-white">${name}</span>`;
+    }
+
+    async function toggleRecording(event) {
+      event?.preventDefault();
+      if (isRecording) {
+        await stopRecording();
+        return;
+      }
+      await startRecording();
+    }
+
+    function addTranscriptMsg(speaker, text, isLive = false) {
+      const ts = new Date().toLocaleTimeString('en', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      const isInterviewer = speaker !== 'You';
+
+      const wrap = document.createElement('div');
+      wrap.className = `flex flex-col space-y-1.5 slide-up ${isInterviewer ? 'max-w-[90%]' : 'items-end ml-auto max-w-[90%]'}`;
+
+      const label = document.createElement('span');
+      label.className = 'mono text-[10px] text-[#8e9192] uppercase tracking-widest';
+      label.textContent = `${speaker} [${ts}]`;
+      wrap.appendChild(label);
+
+      const bubble = document.createElement('div');
+      bubble.className = isInterviewer
+        ? 'p-4 bg-white/[0.03] border border-[#27272A] text-sm text-[#e5e2e1] leading-relaxed'
+        : 'p-4 bg-white/[0.05] border border-white/20 text-sm text-white leading-relaxed';
+
+      if (isLive) {
+        bubble.innerHTML = `<span class="text-white/70 italic">${text}</span><span class="cursor text-white/50"></span>`;
+        bubble.id = 'live-bubble';
+      } else {
+        bubble.textContent = text;
+      }
+      wrap.appendChild(bubble);
+      transcriptEl.appendChild(wrap);
+      transcriptEl.scrollTop = transcriptEl.scrollHeight;
+      return bubble;
+    }
+
+    function removeLiveBubble() {
+      document.getElementById('live-bubble')?.parentElement?.remove();
+    }
+
+    async function startRecording() {
+      if (isEnded || isRecording) return;
+      // Don't interrupt if AI is actively speaking or a request is in flight
+      if (_currentState === 'processing') return;
+      if (_currentState === 'speaking' && !replyAudio.paused) return;
+      if (_currentState === 'speaking' && replyAudio.paused) setState('idle');
+
+      audioChunks = [];
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+        const src = audioCtx.createMediaStreamSource(stream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 128;
+        src.connect(analyser);
+
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
+
+        mediaRecorder = new MediaRecorder(stream, { mimeType });
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.start(100);
+        isRecording = true;
+        setState('recording');
+        animateFromMic(analyser);
+      } catch (err) {
+        stream?.getTracks().forEach(t => t.stop());
+        stream = null;
+        isRecording = false;
+        setState('idle');
+        addTranscriptMsg('System', 'Microphone access failed. Please allow microphone permission and try again.');
+      }
+    }
+
+    async function stopRecording() {
+      if (!isRecording || !mediaRecorder) return;
+      isRecording = false;
+      setState('processing');
+
+      await new Promise(res => {
+        mediaRecorder.onstop = res;
+        if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+        else res();
+      });
+      stream?.getTracks().forEach(t => t.stop());
+      stream = null;
+
+      const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+      if (!blob.size) {
+        addTranscriptMsg('System', 'No audio was captured. Please try again.');
+        setState('idle');
+        return;
+      }
+      await sendAudio(blob, mediaRecorder.mimeType);
+    }
+
+    async function sendAudio(blob, mimeType) {
+      const formData = new FormData();
+      formData.append('session_id', sessionId);
+      formData.append('audio', blob, 'audio.webm');
+
+      // Show live "thinking" bubble
+      addTranscriptMsg('You', '...', true);
+
+      try {
+        const res = await fetch('/api/interview/voice', { method: 'POST', body: formData });
+
+        removeLiveBubble();
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          addTranscriptMsg('System', err.detail || 'Error processing audio. Please try again.', false);
+          setState('idle');
+          return;
+        }
+
+        const data = await res.json();
+
+        // Show user transcript
+        addTranscriptMsg('You', data.user_transcript);
+
+        // Show agent reply
+        addTranscriptMsg(data.agent || 'Interviewer', data.reply_text);
+
+        setAgent(data.agent);
+        if (data.ended) qCount.textContent = '4';
+        else questionCount++, qCount.textContent = Math.min(questionCount, 4);
+
+        // Play audio reply
+        if (!isMuted && data.reply_audio) {
+          setState('speaking');
+          await playAudioB64(data.reply_audio, () => {
+            if (data.ended) showCompleted();
+            else setState('idle');
+          });
+        } else {
+          if (data.ended) showCompleted();
+          else setState('idle');
+        }
+
+      } catch (err) {
+        removeLiveBubble();
+        addTranscriptMsg('System', 'Network error. Please try again.');
+        setState('idle');
+      }
+    }
+
+    async function playTTS(text) {
+      try {
+        const res = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        if (!res.ok) { setState('idle'); return; }
+        const data = await res.json();
+        await playAudioB64(data.audio, () => setState('idle'));
+      } catch { setState('idle'); }
+    }
+
+    async function playAudioB64(b64, onDone) {
+      const audioBlob = base64ToBlob(b64, 'audio/mp3');
+      const url = URL.createObjectURL(audioBlob);
+      replyAudio.pause();
+      replyAudio.src = url;
+      replyAudio.currentTime = 0;
+      replyAudio.onended = () => {
+        URL.revokeObjectURL(url);
+        onDone();
+      };
+      replyAudio.onerror = () => {
+        URL.revokeObjectURL(url);
+        setState('idle');
+      };
+      await replyAudio.play().then(() => {
+        setState('speaking');
+      }).catch(() => {
+        URL.revokeObjectURL(url);
+        setState('idle');
+        onDone();
+      });
+    }
+
+    function base64ToBlob(b64, mime) {
+      const binary = atob(b64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return new Blob([bytes], { type: mime });
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      document.getElementById('mute-icon').textContent = isMuted ? 'volume_off' : 'volume_up';
+      if (isMuted) replyAudio.pause();
+    }
+
+    function showCompleted() {
+      isEnded = true;
+      setState('idle');
+      document.getElementById('completed-overlay').classList.remove('hidden');
+    }
+
+    function endSession() {
+      sessionStorage.removeItem(SESSION_KEY);
+      window.location.href = 'assessment.html';
+    }
+
+    // Init on load
+    window.addEventListener('DOMContentLoaded', async () => {
+      if (!sessionId) {
+        window.location.href = 'assessment.html';
+        return;
+      }
+
+      document.getElementById('session-badge').classList.remove('hidden');
+      document.getElementById('session-short').textContent = sessionId.slice(0, 8) + '...';
+
+      const greeting = sessionStorage.getItem('interview_greeting');
+      const agentName = sessionStorage.getItem('interview_agent') || 'GreeterAgent';
+
+      if (greeting) {
+        sessionStorage.removeItem('interview_greeting');
+        sessionStorage.removeItem('interview_agent');
+        setAgent(agentName);
+        addTranscriptMsg(agentName, greeting);
+
+        // Speak the greeting
+        setState('speaking');
+        await playTTS(greeting);
+      } else {
+        setState('idle');
+      }
+    });
+  </script>
+</body>
+</html>

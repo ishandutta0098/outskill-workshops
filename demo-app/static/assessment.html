@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>OpenAI Interview Engine — Candidate Dashboard</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { background-color: #000000; color: #e5e2e1; font-family: 'Geist', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .glass-card { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(20px); border: 1px solid #27272A; }
+    .terminal-bg { background: #000000; border: 1px solid #27272A; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: #27272A; }
+    code, .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="min-h-screen flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 h-screen fixed left-0 top-0 border-r border-[#27272A] bg-black flex flex-col z-50">
+    <div class="px-6 pt-8 pb-6">
+      <h1 class="text-lg font-semibold text-white tracking-tighter">OPENAI SDK</h1>
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-[#c4c7c8] mt-1 opacity-60">TECHNICAL ASSESSMENT</p>
+    </div>
+    <nav class="flex-1 space-y-0.5 px-2">
+      <a href="assessment.html" class="flex items-center text-white font-bold border-l-2 border-white pl-4 py-3 bg-white/[0.03]">
+        <span class="material-symbols-outlined mr-3 text-[20px]">dashboard</span>
+        <span class="text-[12px] font-semibold uppercase tracking-widest">Dashboard</span>
+      </a>
+      <a href="interview.html" class="flex items-center text-[#c4c7c8] pl-4 py-3 hover:text-white transition-colors hover:bg-white/[0.03]">
+        <span class="material-symbols-outlined mr-3 text-[20px]">mic_external_on</span>
+        <span class="text-[12px] font-semibold uppercase tracking-widest">Interviews</span>
+      </a>
+      <a href="#" class="flex items-center text-[#c4c7c8] pl-4 py-3 hover:text-white transition-colors hover:bg-white/[0.03]">
+        <span class="material-symbols-outlined mr-3 text-[20px]">terminal</span>
+        <span class="text-[12px] font-semibold uppercase tracking-widest">Playground</span>
+      </a>
+      <a href="#" class="flex items-center text-[#c4c7c8] pl-4 py-3 hover:text-white transition-colors hover:bg-white/[0.03]">
+        <span class="material-symbols-outlined mr-3 text-[20px]">analytics</span>
+        <span class="text-[12px] font-semibold uppercase tracking-widest">Analytics</span>
+      </a>
+    </nav>
+    <div class="px-4 mb-4">
+      <button onclick="startInterview()" class="w-full py-3 bg-white text-black text-[12px] font-semibold uppercase tracking-widest hover:bg-white/90 transition-opacity flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[18px]">bolt</span>
+        Start Practice
+      </button>
+    </div>
+    <div class="mt-auto border-t border-[#27272A] px-2 py-4 space-y-0.5">
+      <a href="/" class="flex items-center text-[#c4c7c8] pl-4 py-2 hover:text-white transition-colors text-[12px] uppercase tracking-widest">
+        <span class="material-symbols-outlined mr-3 text-[18px]">arrow_back</span>
+        Showcase
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="ml-64 flex-1 p-10 min-h-screen">
+
+    <!-- Page header -->
+    <div class="mb-8">
+      <h2 class="text-4xl font-semibold text-white tracking-tighter mb-1">Dashboard</h2>
+      <p class="text-[#8e9192] text-sm">AI Agents Engineer Technical Assessment</p>
+    </div>
+
+    <!-- Stats row -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="glass-card rounded-lg p-5">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-[#8e9192] mb-2">Sessions Available</p>
+        <p class="text-3xl font-semibold text-white">∞</p>
+        <p class="text-xs text-[#8e9192] mt-1">Unlimited practice</p>
+      </div>
+      <div class="glass-card rounded-lg p-5">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-[#8e9192] mb-2">Agent Pipeline</p>
+        <p class="text-3xl font-semibold text-white">3</p>
+        <p class="text-xs text-[#8e9192] mt-1">Greeter → Questioner → Feedback</p>
+      </div>
+      <div class="glass-card rounded-lg p-5">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-[#8e9192] mb-2">Tools Active</p>
+        <p class="text-3xl font-semibold text-white">3</p>
+        <p class="text-xs text-[#8e9192] mt-1">WebSearch · FileSearch · CodeInterpreter</p>
+      </div>
+    </div>
+
+    <!-- Role card -->
+    <div class="glass-card rounded-lg p-8 mb-6">
+      <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-black text-[20px]" style="font-variation-settings:'FILL' 1">smart_toy</span>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-white">AI Agents SDK Engineer</h3>
+              <p class="text-[#8e9192] text-sm">OpenAI · San Francisco, CA</p>
+            </div>
+          </div>
+          <p class="text-[#c4c7c8] text-sm leading-relaxed mb-5 max-w-2xl">
+            Join the OpenAI Agents SDK team to design, build, and teach the patterns developers use to create production-grade AI agents. Work on multi-agent orchestration, hosted tools, voice pipelines, and developer education.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="bg-[#1f1f22] border border-[#27272A] text-[#c4c7c8] text-xs px-3 py-1 rounded-full mono">agent handoffs</span>
+            <span class="bg-[#1f1f22] border border-[#27272A] text-[#c4c7c8] text-xs px-3 py-1 rounded-full mono">function_tool</span>
+            <span class="bg-[#1f1f22] border border-[#27272A] text-[#c4c7c8] text-xs px-3 py-1 rounded-full mono">VoicePipeline</span>
+            <span class="bg-[#1f1f22] border border-[#27272A] text-[#c4c7c8] text-xs px-3 py-1 rounded-full mono">FileSearchTool</span>
+            <span class="bg-[#1f1f22] border border-[#27272A] text-[#c4c7c8] text-xs px-3 py-1 rounded-full mono">Pydantic</span>
+            <span class="bg-[#1f1f22] border border-[#27272A] text-[#c4c7c8] text-xs px-3 py-1 rounded-full mono">RunContextWrapper</span>
+          </div>
+        </div>
+        <div class="flex-shrink-0">
+          <button onclick="startInterview()" id="start-btn" class="flex items-center gap-2 bg-white text-black px-6 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-white/90 transition-all">
+            <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+            Start Interview
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent pipeline diagram -->
+    <div class="glass-card rounded-lg p-6 mb-6">
+      <h4 class="text-[11px] font-semibold uppercase tracking-widest text-[#8e9192] mb-5">Agent Pipeline</h4>
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex flex-col items-center gap-1">
+          <div class="bg-[#1f1f22] border border-[#27272A] rounded-lg px-4 py-3 text-center min-w-[110px]">
+            <span class="material-symbols-outlined text-[20px] text-white block mb-1">waving_hand</span>
+            <p class="text-xs font-semibold text-white">GreeterAgent</p>
+            <p class="text-[10px] text-[#8e9192] mono">gpt-4o</p>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-[#444748] text-[20px]">arrow_forward</span>
+        <div class="flex flex-col items-center gap-1">
+          <div class="bg-[#1f1f22] border border-[#27272A] rounded-lg px-4 py-3 text-center min-w-[110px]">
+            <span class="material-symbols-outlined text-[20px] text-white block mb-1">quiz</span>
+            <p class="text-xs font-semibold text-white">QuestionerAgent</p>
+            <p class="text-[10px] text-[#8e9192] mono">gpt-4o</p>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-[#444748] text-[20px]">arrow_forward</span>
+        <div class="flex flex-col items-center gap-1">
+          <div class="bg-[#1f1f22] border border-[#27272A] rounded-lg px-4 py-3 text-center min-w-[110px]">
+            <span class="material-symbols-outlined text-[20px] text-white block mb-1">grade</span>
+            <p class="text-xs font-semibold text-white">FeedbackAgent</p>
+            <p class="text-[10px] text-[#8e9192] mono">gpt-4o</p>
+          </div>
+        </div>
+        <div class="ml-auto flex flex-col gap-2">
+          <div class="flex items-center gap-2 text-xs text-[#8e9192]">
+            <span class="material-symbols-outlined text-[14px] text-white">search</span>
+            WebSearchTool
+          </div>
+          <div class="flex items-center gap-2 text-xs text-[#8e9192]">
+            <span class="material-symbols-outlined text-[14px] text-white">description</span>
+            FileSearchTool (resume)
+          </div>
+          <div class="flex items-center gap-2 text-xs text-[#8e9192]">
+            <span class="material-symbols-outlined text-[14px] text-white">code</span>
+            CodeInterpreterTool
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SDK concepts covered -->
+    <div class="glass-card rounded-lg p-6">
+      <h4 class="text-[11px] font-semibold uppercase tracking-widest text-[#8e9192] mb-4">SDK Concepts Demonstrated</h4>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="terminal-bg rounded p-3">
+          <p class="text-xs font-semibold text-white mb-0.5">Handoffs</p>
+          <p class="text-[11px] text-[#8e9192]">Agent-to-agent routing via <span class="mono text-[#c4c7c8]">handoff()</span></p>
+        </div>
+        <div class="terminal-bg rounded p-3">
+          <p class="text-xs font-semibold text-white mb-0.5">Hosted Tools</p>
+          <p class="text-[11px] text-[#8e9192]">WebSearch, FileSearch, CodeInterpreter</p>
+        </div>
+        <div class="terminal-bg rounded p-3">
+          <p class="text-xs font-semibold text-white mb-0.5">Multi-turn</p>
+          <p class="text-[11px] text-[#8e9192]">History preserved across <span class="mono text-[#c4c7c8]">Runner.run()</span></p>
+        </div>
+        <div class="terminal-bg rounded p-3">
+          <p class="text-xs font-semibold text-white mb-0.5">Scoring</p>
+          <p class="text-[11px] text-[#8e9192]">CodeInterpreter aggregates eval signals</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    async function startInterview() {
+      const btn = document.getElementById('start-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span> Starting...';
+
+      try {
+        const res = await fetch('/api/interview/start', { method: 'POST' });
+        if (!res.ok) throw new Error('Failed to start');
+        const data = await res.json();
+        sessionStorage.setItem('interview_session_id', data.session_id);
+        sessionStorage.setItem('interview_greeting', data.reply);
+        sessionStorage.setItem('interview_agent', data.agent);
+        window.location.href = 'interview.html';
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">play_arrow</span> Start Interview';
+        alert('Failed to start interview. Make sure the backend server is running.');
+      }
+    }
+  </script>
+</body>
+</html>

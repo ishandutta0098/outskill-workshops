@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>AI Agent Showcase — Outskill Workshops</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#131316",
+            "surface-container-lowest": "#0e0e11",
+            "surface-container-low": "#1b1b1e",
+            "surface-container": "#1f1f22",
+            "surface-container-high": "#2a2a2d",
+            "surface-container-highest": "#353438",
+            "on-surface": "#e4e1e6",
+            "on-surface-variant": "#c4c7c8",
+            "outline-variant": "#444748",
+            "outline": "#8e9192",
+            "primary": "#ffffff",
+            "background": "#131316",
+            "border-subtle": "#27272A",
+          },
+          fontFamily: {
+            sans: ["Geist", "sans-serif"],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Geist', sans-serif; background-color: #09090B; color: #e4e1e6; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .glass-card {
+      background: rgba(18, 18, 18, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid #27272A;
+      transition: border-color 0.3s ease, transform 0.2s ease;
+    }
+    .glass-card:hover { border-color: #3F3F46; transform: translateY(-2px); }
+    .grid-texture {
+      background-image: linear-gradient(#121212 1px, transparent 1px), linear-gradient(90deg, #121212 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-color: #09090B;
+    }
+    .glow-blue { box-shadow: 0 0 60px rgba(59, 130, 246, 0.08); }
+    .glow-purple { box-shadow: 0 0 60px rgba(139, 92, 246, 0.08); }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Top Nav -->
+  <header class="sticky top-0 z-50 border-b border-[#27272A] bg-[#09090B]/90 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <span class="text-white font-bold text-lg tracking-tighter">AI SHOWCASE</span>
+      <nav class="hidden md:flex gap-8">
+        <a href="indigo.html" class="text-[#c4c7c8] text-sm hover:text-white transition-colors">IndiGo</a>
+        <a href="assessment.html" class="text-[#c4c7c8] text-sm hover:text-white transition-colors">Assessment</a>
+        <a href="https://github.com" target="_blank" class="text-[#c4c7c8] text-sm hover:text-white transition-colors">Documentation</a>
+      </nav>
+      <div class="flex gap-3">
+        <button class="text-white hover:opacity-70 transition-opacity">
+          <span class="material-symbols-outlined text-[20px]">terminal</span>
+        </button>
+        <button class="text-white hover:opacity-70 transition-opacity">
+          <span class="material-symbols-outlined text-[20px]">settings</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="grid-texture min-h-screen">
+
+    <!-- Hero -->
+    <section class="max-w-6xl mx-auto px-6 pt-20 pb-16 text-center relative">
+      <div class="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none"></div>
+      <div class="relative z-10 space-y-5">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#27272A] bg-[#1f1f22] mb-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+          <span class="text-[11px] font-medium uppercase tracking-widest text-[#c4c7c8]">Production Ready</span>
+        </div>
+        <h1 class="text-5xl md:text-6xl font-semibold tracking-tight text-white">
+          AI Agent Showcase
+        </h1>
+        <p class="text-[#c4c7c8] text-lg max-w-2xl mx-auto leading-relaxed">
+          A curated gallery of advanced, task-specific autonomous agents built with the OpenAI Agents SDK — demonstrating tools, handoffs, context, and guardrails.
+        </p>
+      </div>
+    </section>
+
+    <!-- Cards -->
+    <section class="max-w-6xl mx-auto px-6 pb-24">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- IndiGo Card -->
+        <div class="glass-card glow-blue relative overflow-hidden rounded-lg group p-8 flex flex-col justify-between min-h-[520px]">
+          <div class="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/15 transition-colors duration-500"></div>
+          <div>
+            <div class="flex justify-between items-start mb-8">
+              <div>
+                <h3 class="text-xl font-medium text-white mb-1">IndiGo AI Assistant</h3>
+                <p class="text-[11px] font-medium uppercase tracking-widest text-[#8e9192]">Travel &amp; Customer Service Agent</p>
+              </div>
+              <span class="material-symbols-outlined text-white text-4xl">flight_takeoff</span>
+            </div>
+
+            <!-- Preview image -->
+            <div class="aspect-video w-full rounded bg-[#1f1f22] mb-8 overflow-hidden border border-[#27272A] flex items-center justify-center">
+              <div class="text-center p-6">
+                <span class="material-symbols-outlined text-[48px] text-blue-400/60 mb-3 block">chat_bubble</span>
+                <p class="text-[#8e9192] text-sm">Multi-agent customer service with handoffs,<br/>guardrails, and context</p>
+              </div>
+            </div>
+
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-[#c4c7c8] text-sm">
+                <span class="material-symbols-outlined text-[18px] text-green-400" style="font-variation-settings:'FILL' 1">check_circle</span>
+                FAQ Specialist with FileSearch (IndiGo policy PDF)
+              </li>
+              <li class="flex items-center gap-2 text-[#c4c7c8] text-sm">
+                <span class="material-symbols-outlined text-[18px] text-green-400" style="font-variation-settings:'FILL' 1">check_circle</span>
+                Seat Booking Agent with shared BookingContext
+              </li>
+              <li class="flex items-center gap-2 text-[#c4c7c8] text-sm">
+                <span class="material-symbols-outlined text-[18px] text-green-400" style="font-variation-settings:'FILL' 1">check_circle</span>
+                Input &amp; output guardrails
+              </li>
+            </ul>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-[#27272A]">
+            <a href="indigo.html" class="w-full py-3 bg-white text-black text-sm font-medium uppercase tracking-widest rounded-lg hover:bg-white/90 transition-all flex items-center justify-center gap-2">
+              Launch Demo
+              <span class="material-symbols-outlined text-[18px]">arrow_outward</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- OpenAI Assessment Card -->
+        <div class="glass-card glow-purple relative overflow-hidden rounded-lg group p-8 flex flex-col justify-between min-h-[520px]">
+          <div class="absolute -top-24 -right-24 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl group-hover:bg-violet-500/15 transition-colors duration-500"></div>
+          <div>
+            <div class="flex justify-between items-start mb-8">
+              <div>
+                <h3 class="text-xl font-medium text-white mb-1">OpenAI Assessment</h3>
+                <p class="text-[11px] font-medium uppercase tracking-widest text-[#8e9192]">AI Agents Engineer Interview</p>
+              </div>
+              <span class="material-symbols-outlined text-white text-4xl">mic_external_on</span>
+            </div>
+
+            <!-- Preview image -->
+            <div class="aspect-video w-full rounded bg-[#1f1f22] mb-8 overflow-hidden border border-[#27272A] flex items-center justify-center">
+              <div class="text-center p-6">
+                <span class="material-symbols-outlined text-[48px] text-violet-400/60 mb-3 block">psychology</span>
+                <p class="text-[#8e9192] text-sm">Multi-agent interview pipeline with handoffs,<br/>web search, and scoring</p>
+              </div>
+            </div>
+
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-[#c4c7c8] text-sm">
+                <span class="material-symbols-outlined text-[18px] text-green-400" style="font-variation-settings:'FILL' 1">check_circle</span>
+                Greeter → Questioner → Feedback agent chain
+              </li>
+              <li class="flex items-center gap-2 text-[#c4c7c8] text-sm">
+                <span class="material-symbols-outlined text-[18px] text-green-400" style="font-variation-settings:'FILL' 1">check_circle</span>
+                WebSearch + CodeInterpreter for scoring
+              </li>
+              <li class="flex items-center gap-2 text-[#c4c7c8] text-sm">
+                <span class="material-symbols-outlined text-[18px] text-green-400" style="font-variation-settings:'FILL' 1">check_circle</span>
+                Resume FileSearch (if available)
+              </li>
+            </ul>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-[#27272A]">
+            <a href="assessment.html" class="w-full py-3 bg-white text-black text-sm font-medium uppercase tracking-widest rounded-lg hover:bg-white/90 transition-all flex items-center justify-center gap-2">
+              Launch Demo
+              <span class="material-symbols-outlined text-[18px]">arrow_outward</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tech stack footnote -->
+      <div class="mt-12 text-center">
+        <p class="text-[#444748] text-xs uppercase tracking-widest">Built with OpenAI Agents SDK · FastAPI · Tailwind CSS</p>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
