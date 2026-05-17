@@ -34,6 +34,23 @@ load_dotenv("../../.env")
 pip install -r requirements.txt
 ```
 
+## Functional Demo App
+
+A browser-based demo for the two workshop agents is available at `../demo-app/`.
+
+It includes:
+
+- An IndiGo customer service chatbot with FAQ retrieval, handoffs, shared booking context, and guardrails.
+- An OpenAI AI Agents Engineer voice interview demo with microphone input, transcription, interviewer audio, and a live transcript UI.
+
+Run it from the repository root:
+
+```bash
+cd demo-app
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
 ## Workshop Flow
 
 - Run the notebooks in order for a progressive experience.
